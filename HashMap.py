@@ -44,6 +44,7 @@ class HashMap:
         entry = self.__entries[bucketIndex]
         while entry is not None:
             if ((entry.getKey() is key) or (entry.getKey() == key)):
+                self.remove(key)
                 return entry.getValue()
             entry = entry.getNext()
         return None

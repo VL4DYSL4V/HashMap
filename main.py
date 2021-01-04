@@ -25,7 +25,6 @@ def countFrequencyOfWords(lines):
                     hashMap.set(word, 1)
     return hashMap
 
-
 # def getWordsFromFile(path):
 #     hashMap = HashMap.HashMap()
 #     lines = None
@@ -44,6 +43,8 @@ def countFrequencyOfWords(lines):
 #     return hashMap
 #
 #
+
+
 def askWords():
     words = []
     while True:
@@ -53,6 +54,7 @@ def askWords():
         else:
             break
     return words
+
 
 if __name__ == '__main__':
     lines = askTextFromConsole()
