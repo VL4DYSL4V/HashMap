@@ -1,5 +1,5 @@
-import copy
 import re
+import sys
 # This is a sample Python script.
 
 # Press Shift+F10 to execute it or replace it with your code.
@@ -7,28 +7,38 @@ import re
 import HashMap
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
+def getWordsFromFile(path):
     hashMap = HashMap.HashMap()
     lines = None
-    with open("text2.txt", "r") as f:
+    with open(path, "r") as f:
         lines = f.readlines()
     for line in lines:
+        line = re.sub('[^a-zA-Z]', " ", line).lower()
         words = line.split(" ")
         for word in words:
-            word = re.sub('[^a-zA-Z]', '', word).lower()
-            frequency = hashMap.get(word)
-            if frequency is not None:
-                hashMap.set(word, frequency + 1)
-            else:
-                hashMap.set(word, 1)
+            if word != "":
+                frequency = hashMap.get(word)
+                if frequency is not None:
+                    hashMap.set(word, frequency + 1)
+                else:
+                    hashMap.set(word, 1)
+    return hashMap
 
-print("Unique words: ", hashMap.size())
-print(hashMap.get("and"))
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+def askWords():
+    words = []
+    while True:
+        inp = input()
+        if inp:
+            words.append(inp)
+        else:
+            break
+    return words
+
+
+if __name__ == '__main__':
+    hashMap = getWordsFromFile("text2.txt")
+    print("Unique words: ", hashMap.size())
+    words = askWords()
+    for w in words:
+        print(w, ":", hashMap.get(w))
