@@ -146,7 +146,6 @@ def countFrequencyOfWords(lines):
         line = re.sub('[^a-zA-Z]', " ", line).lower()
         words = line.split(" ")
         for word in words:
-            print(word)
             if word != "":
                 frequency = hashMap.get(word)
                 if frequency is not None:
@@ -171,7 +170,6 @@ if __name__ == '__main__':
     lines = askTextFromConsole()
     words = askWords()
     hashMap = countFrequencyOfWords(lines)
-    print("unique words: ", hashMap.size())
-    print(hashMap)
+    print("unique words =", hashMap.size())
     for w in words:
         print(w, ":", hashMap.get(w))
