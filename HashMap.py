@@ -85,6 +85,9 @@ class HashMap:
         if lastEntry is None:
             whereTo[bucketIndex] = HashMap.__Entry(key, value)
             return
+        if lastEntry.getKey() is key:
+            lastEntry.setValue(value)
+            return
         while lastEntry.getNext() is not None:
             if lastEntry.getKey() is key:
                 lastEntry.setValue(value)
