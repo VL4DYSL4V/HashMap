@@ -15,36 +15,20 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     hashMap = HashMap.HashMap()
-    # hashMap.set("and", 1)
-    # print(hashMap)
-    # hashMap.set(copy.deepcopy("and"), 2)
-    # print(hashMap)
-    # hashMap.set("and", 3)
-    # print(hashMap)
     lines = None
-    d = {}
     with open("text2.txt", "r") as f:
         lines = f.readlines()
     for line in lines:
         words = line.split(" ")
         for word in words:
             word = re.sub('[^a-zA-Z]', '', word).lower()
-            frequencyD = d.get(word)
-            if frequencyD is not None:
-                d[word] = frequencyD + 1
-            else:
-                d[word] = 1
-
             frequency = hashMap.get(word)
             if frequency is not None:
                 hashMap.set(word, frequency + 1)
             else:
                 hashMap.set(word, 1)
-print(len(d))
-print(d)
 
-print(hashMap)
-print(hashMap.size())
+print("Unique words: ", hashMap.size())
 print(hashMap.get("and"))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

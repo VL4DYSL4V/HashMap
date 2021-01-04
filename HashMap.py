@@ -51,7 +51,7 @@ class HashMap:
     def set(self, key, value):
         if self.size() / len(self.__entries) >= self.__loadFactor:
             self.__normalize()
-            # print("new buckets: " + str(len(self.__entries)))
+            print("resizing to ", str(len(self.__entries)), " buckets")
         self.__doSet(key, value, self.__entries)
 
     def remove(self, key):
@@ -87,11 +87,7 @@ class HashMap:
         if lastEntry is None:
             whereTo[bucketIndex] = HashMap.__Entry(key, value)
             return
-        #look at first
-        if ((lastEntry.getKey() is key) or (lastEntry.getKey() == key)):
-            lastEntry.setValue(value)
-            return
-        #look between
+        #look at everything but last
         while lastEntry.getNext() is not None:
             if ((lastEntry.getKey() is key) or (lastEntry.getKey() == key)):
                 lastEntry.setValue(value)
