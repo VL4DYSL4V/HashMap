@@ -1,22 +1,152 @@
 import re
-import HashMap
+import copy
+
+class HashMap:
+
+    def __init__(self):
+        self.__entries = [None] * 5
+        self.__loadFactor = 4
+
+    class __Entry:
+
+        def __init__(self, key, value):
+            self.__prev = None
+            self.__next = None
+            self.__key = copy.deepcopy(key)
+            self.__value = value
+
+        def getNext(self):
+            return self.__next
+
+        def setNext(self, entry):
+            self.__next = entry
+
+        def getPrev(self):
+            return self.__prev
+
+        def setPrev(self, entry):
+            self.__prev = entry
+
+        def getKey(self):
+            return self.__key
+
+        def getValue(self):
+            return self.__value
+
+        def setValue(self, value):
+            self.__value = value
+
+        def __repr__(self):
+            return "Key: " + str(self.__key) + ", value: " + str(self.__value)
+
+    def get(self, key):
+        bucketIndex = self.__computeBucketIndex(key, len(self.__entries))
+        entry = self.__entries[bucketIndex]
+        while entry is not None:
+            if ((entry.getKey() is key) or (entry.getKey() == key)):
+                self.remove(key)
+                return entry.getValue()
+            entry = entry.getNext()
+        return None
+
+    def set(self, key, value):
+        if self.size() / len(self.__entries) >= self.__loadFactor:
+            self.__normalize()
+            print("resizing to ", str(len(self.__entries)), " buckets")
+        self.__doSet(key, value, self.__entries)
+
+    def remove(self, key):
+        bucketIndex = self.__computeBucketIndex(key, len(self.__entries))
+        entry = self.__entries[bucketIndex]
+        while entry is not None:
+            if ((entry.getKey() is key) or (entry.getKey() == key)):
+                prev = entry.getPrev()
+                next = entry.getNext()
+                if prev is None:
+                    self.__entries[bucketIndex] = next
+                else:
+                    prev.setNext(next)
+                if next is not None:
+                    next.setPrev(prev)
+                entry.setNext(None)
+                entry.setPrev(None)
+                return
+            entry = entry.getNext()
+
+    def size(self):
+        res = 0
+        for entry in self.__entries:
+            curr = entry
+            while curr is not None:
+                res += 1
+                curr = curr.getNext()
+        return res
+
+    def __doSet(self, key, value, whereTo):
+        bucketIndex = self.__computeBucketIndex(key, len(whereTo))
+        lastEntry = whereTo[bucketIndex]
+        if lastEntry is None:
+            whereTo[bucketIndex] = HashMap.__Entry(key, value)
+            return
+        #look at everything but last
+        while lastEntry.getNext() is not None:
+            if ((lastEntry.getKey() is key) or (lastEntry.getKey() == key)):
+                lastEntry.setValue(value)
+                return
+            lastEntry = lastEntry.getNext()
+        #look at last
+        if ((lastEntry.getKey() is key) or (lastEntry.getKey() == key)):
+            lastEntry.setValue(value)
+            return
+        newEntry = HashMap.__Entry(key, value)
+        lastEntry.setNext(newEntry)
+        newEntry.setPrev(lastEntry)
+
+    def __computeBucketIndex(self, key, bucketAmount):
+        return hash(key) % bucketAmount
+
+    def __normalize(self):
+        newEntriesHolder = [None] * (len(self.__entries) * 2)
+        for entry in self.__entries:
+            curr = entry
+            while curr is not None:
+
+                self.__doSet(curr.getKey(), curr.getValue(), newEntriesHolder)
+                curr = curr.getNext()
+
+        self.__entries = newEntriesHolder
+
+    def __repr__(self):
+        res = "HashMap{ "
+        for entry in self.__entries:
+            curr = entry
+            while curr is not None:
+                res += "(" + str(curr) + "), "
+                curr = curr.getNext()
+        res += " }"
+        return res
+
 
 
 def askTextFromConsole():
     lines = []
     line = ""
-    while line != "== END ==":
+    while True:
         line = input()
-        lines.append(line)
+        if line != "== END ==":
+            lines.append(line)
+        else:
+            break
     return lines
 
 
 def countFrequencyOfWords(lines):
-    hashMap = HashMap.HashMap()
+    hashMap = HashMap()
     for line in lines:
         line = re.sub('[^a-zA-Z]', " ", line).lower()
         words = line.split(" ")
         for word in words:
+            print(word)
             if word != "":
                 frequency = hashMap.get(word)
                 if frequency is not None:
@@ -24,25 +154,6 @@ def countFrequencyOfWords(lines):
                 else:
                     hashMap.set(word, 1)
     return hashMap
-
-# def getWordsFromFile(path):
-#     hashMap = HashMap.HashMap()
-#     lines = None
-#     with open(path, "r") as f:
-#         lines = f.readlines()
-#     for line in lines:
-#         line = re.sub('[^a-zA-Z]', " ", line).lower()
-#         words = line.split(" ")
-#         for word in words:
-#             if word != "":
-#                 frequency = hashMap.get(word)
-#                 if frequency is not None:
-#                     hashMap.set(word, frequency + 1)
-#                 else:
-#                     hashMap.set(word, 1)
-#     return hashMap
-#
-#
 
 
 def askWords():
@@ -58,9 +169,9 @@ def askWords():
 
 if __name__ == '__main__':
     lines = askTextFromConsole()
-    # hashMap = getWordsFromFile("text2.txt")
-    # print("Unique words: ", hashMap.size())
     words = askWords()
     hashMap = countFrequencyOfWords(lines)
+    print("unique words: ", hashMap.size())
+    print(hashMap)
     for w in words:
         print(w, ":", hashMap.get(w))
