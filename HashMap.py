@@ -43,7 +43,7 @@ class HashMap:
         bucketIndex = self.__computeBucketIndex(key, len(self.__entries))
         entry = self.__entries[bucketIndex]
         while entry is not None:
-            if entry.getKey() is key:
+            if ((entry.getKey() is key) or (entry.getKey() == key)):
                 return entry.getValue()
             entry = entry.getNext()
         return None
@@ -51,22 +51,24 @@ class HashMap:
     def set(self, key, value):
         if self.size() / len(self.__entries) >= self.__loadFactor:
             self.__normalize()
+            # print("new buckets: " + str(len(self.__entries)))
         self.__doSet(key, value, self.__entries)
 
     def remove(self, key):
         bucketIndex = self.__computeBucketIndex(key, len(self.__entries))
         entry = self.__entries[bucketIndex]
         while entry is not None:
-            if entry.getKey() is key:
+            if ((entry.getKey() is key) or (entry.getKey() == key)):
                 prev = entry.getPrev()
                 next = entry.getNext()
                 if prev is None:
-                    #it means, it is the first in bucket
                     self.__entries[bucketIndex] = next
                 else:
                     prev.setNext(next)
                 if next is not None:
                     next.setPrev(prev)
+                entry.setNext(None)
+                entry.setPrev(None)
                 return
             entry = entry.getNext()
 
@@ -85,14 +87,20 @@ class HashMap:
         if lastEntry is None:
             whereTo[bucketIndex] = HashMap.__Entry(key, value)
             return
-        if lastEntry.getKey() is key:
+        #look at first
+        if ((lastEntry.getKey() is key) or (lastEntry.getKey() == key)):
             lastEntry.setValue(value)
             return
+        #look between
         while lastEntry.getNext() is not None:
-            if lastEntry.getKey() is key:
+            if ((lastEntry.getKey() is key) or (lastEntry.getKey() == key)):
                 lastEntry.setValue(value)
                 return
             lastEntry = lastEntry.getNext()
+        #look at last
+        if ((lastEntry.getKey() is key) or (lastEntry.getKey() == key)):
+            lastEntry.setValue(value)
+            return
         newEntry = HashMap.__Entry(key, value)
         lastEntry.setNext(newEntry)
         newEntry.setPrev(lastEntry)
@@ -105,6 +113,7 @@ class HashMap:
         for entry in self.__entries:
             curr = entry
             while curr is not None:
+
                 self.__doSet(curr.getKey(), curr.getValue(), newEntriesHolder)
                 curr = curr.getNext()
 
